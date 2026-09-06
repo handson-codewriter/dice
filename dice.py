@@ -1,9 +1,15 @@
+import argparse
 import random
 import sys
 
 
 def main():
-    print(random.randint(1, 6))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=None)
+    args = parser.parse_args()
+
+    rng = random.Random(args.seed)
+    print(rng.randint(1, 6))
     return 0
 
 
