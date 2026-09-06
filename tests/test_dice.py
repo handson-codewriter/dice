@@ -31,3 +31,39 @@ def test_seed_is_deterministic():
     assert first.returncode == 0
     assert second.returncode == 0
     assert first.stdout == second.stdout
+
+
+def test_multiple_dice_and_sum():
+    result = subprocess.run(
+        [sys.executable, "dice.py", "-n", "3", "--seed", "42"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0
+    lines = result.stdout.strip().splitlines()
+    assert len(lines) == 2
+    rolls = lines[0].split(" ")
+    assert len(rolls) == 3
+    for roll in rolls:
+        value = int(roll)
+        assert 1 <= value <= 6
+    assert lines[1] == f"som={sum(int(r) for r in rolls)}"
+
+    bad = subprocess.run(
+        [sys.executable, "dice.py", "-n", "0"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert bad.returncode == 2
+    assert bad.stderr.strip() != ""
+
+    negative = subprocess.run(
+        [sys.executable, "dice.py", "-n", "-1"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert negative.returncode == 2
+    assert negative.stderr.strip() != ""
