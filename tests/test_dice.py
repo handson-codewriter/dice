@@ -67,3 +67,22 @@ def test_multiple_dice_and_sum():
     )
     assert negative.returncode == 2
     assert negative.stderr.strip() != ""
+
+
+def test_stats_distribution():
+    result = subprocess.run(
+        [sys.executable, "dice.py", "--stats", "600"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0
+    lines = result.stdout.strip().splitlines()
+    assert len(lines) == 6
+    counts = {}
+    for line in lines:
+        value, count = line.split(":")
+        counts[int(value)] = int(count)
+    assert sorted(counts.keys()) == [1, 2, 3, 4, 5, 6]
+    for value in range(1, 7):
+        assert 60 <= counts[value] <= 140
