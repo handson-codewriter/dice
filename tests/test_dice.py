@@ -7,6 +7,7 @@ def test_single_roll_range():
         [sys.executable, "dice.py"],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert result.returncode == 0
     output = result.stdout.strip()
