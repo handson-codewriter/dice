@@ -1,0 +1,49 @@
+name: ci
+
+# Eigen CI-poort voor de sprintgewijze levering (P2a, R5) -- gebruikt door
+# de gedeelde worktree van de manager, niet door de --scaffold-CLI-modus
+# (die blijft bij gates.yml). Draait smoke.sh alleen als het al bestaat --
+# een project met een smoke-criterium in een latere sprint mag zijn eerste
+# sprints niet genuine-rood zien voordat smoke.sh uberhaupt geschreven is.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: installeer
+        run: python -m pip install pytest ruff mypy
+
+      - name: pytest
+        run: pytest -q
+
+      - name: ruff
+        run: ruff check .
+
+      - name: mypy
+        run: mypy .
+
+      - name: smoke (alleen als al geleverd)
+        run: |
+          if [ -f smoke.sh ]; then
+            bash smoke.sh
+          else
+            echo "smoke.sh nog niet geleverd in deze sprint — geen poort"
+          fi
