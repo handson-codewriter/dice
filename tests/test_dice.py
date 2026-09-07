@@ -69,6 +69,18 @@ def test_multiple_dice_and_sum():
     assert negative.stderr.strip() != ""
 
 
+def test_n_and_stats_are_mutually_exclusive():
+    result = subprocess.run(
+        [sys.executable, "dice.py", "-n", "3", "--stats", "60"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 2
+    assert result.stderr.strip() != ""
+    assert result.stdout.strip() == ""
+
+
 def test_stats_distribution():
     result = subprocess.run(
         [sys.executable, "dice.py", "--stats", "600"],

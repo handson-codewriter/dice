@@ -16,6 +16,9 @@ def main():
     if args.stats is not None and args.stats <= 0:
         parser.error("--stats moet een positief getal zijn")
 
+    if args.n is not None and args.stats is not None:
+        parser.error("-n en --stats kunnen niet samen worden gebruikt")
+
     rng = random.Random(args.seed)
 
     if args.stats is not None:
